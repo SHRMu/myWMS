@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="de.demarks.wms.dao.PacketRefMapper">
+
+	<resultMap type="de.demarks.wms.domain.PacketRef" id="packetRef">
+		<id property="id" column="id"/>
+		<result property="trace" column="trace"/>
+		<result property="refid" column="ref_id" />
+		<result property="reftrace" column="ref_trace" />
+		<result property="time" column="ref_time" />
+		<result property="status" column="ref_status" />
+		<result property="desc" column="ref_desc"/>
+		<result property="repositoryID" column="ref_repo_id" />
+	</resultMap>
+
+	<select id="selectAll" resultMap="packetRef">
+		select
+			pr.PACKET_ID as id,
+			pr.PACKET_TRACE as trace,
+			pr.PACKET_REF_ID as ref_id,
+			p.PACKET_TRACE as ref_trace,
+			p.PACKET_TIME as ref_time,
+			p.PACKET_STATUS as ref_status,
+			p.PACKET_DESC as ref_desc,
+			p.PACKET_REPOID as ref_repo_id
+		from
+			wms_packet_ref pr, wms_packet p
+		where
+			pr.PACKET_REF_ID = p.PACKET_ID
+		<if test="repositoryID !=null">
+			and p.PACKET_REPOID = #{repositoryID}
+		</if>
+	</select>
+	
+	<select id="selectByPacketID" resultMap="packetRef">
+		select
+			pr.PACKET_ID as id,
+			pr.PACKET_TRACE as trace,
+			pr.PACKET_REF_ID as ref_id,
+			p.PACKET_TRACE as ref_trace,
+			p.PACKET_TIME as ref_time,
+			p.PACKET_STATUS as ref_status,
+			p.PACKET_DESC as ref_desc,
+			p.PACKET_REPOID as ref_repo_id
+		from
+			wms_packet_ref pr, wms_packet p
+		where
+			pr.PACKET_REF_ID = p.PACKET_ID and
+			pr.PACKET_ID = #{packetDOID}
+	</select>
+
+	<select id="selectByRefID" resultMap="packetRef">
+		select
+			pr.PACKET_ID as id,
+			pr.PACKET_TRACE as trace,
+			pr.PACKET_REF_ID as ref_id,
+			p.PACKET_TRACE as ref_trace,
+			p.PACKET_TIME as ref_time,
+			p.PACKET_STATUS as ref_status,
+			p.PACKET_DESC as ref_desc,
+			p.PACKET_REPOID as ref_repo_id
+		from
+			wms_packet_ref pr, wms_packet p
+		where
+			pr.PACKET_REF_ID = p.PACKET_ID and
+			pr.PACKET_REF_ID = #{refID}
+		<if test="repositoryID !=null">
+			and p.PACKET_REPOID = #{repositoryID}
+		</if>
+	</select>
+
+	<select id="selectByTrace" resultMap="packetRef">
+		select
+			pr.PACKET_ID as id,
+			pr.PACKET_TRACE as trace,
+			pr.PACKET_REF_ID as ref_id,
+			p.PACKET_TRACE as ref_trace,
+			p.PACKET_TIME as ref_time,
+			p.PACKET_STATUS as ref_status,
+			p.PACKET_DESC as ref_desc,
+			p.PACKET_REPOID as ref_repo_id
+		from
+			wms_packet_ref pr, wms_packet p
+		where
+			pr.PACKET_REF_ID = p.PACKET_ID and
+			pr.PACKET_TRACE = #{trace}
+		<if test="refID !=null">
+			and pr.PACKET_REF_ID = #{refID}
+		</if>
+		<if test="repositoryID !=null">
+			and p.PACKET_REPOID = #{repositoryID}
+		</if>
+	</select>
+
+	<select id="selectByTraceApproximate" resultMap="packetRef">
+		select
+			pr.PACKET_ID as id,
+			pr.PACKET_TRACE as trace,
+			pr.PACKET_REF_ID as ref_id,
+			p.PACKET_TRACE as ref_trace,
+			p.PACKET_TIME as ref_time,
+			p.PACKET_STATUS as ref_status,
+			p.PACKET_DESC as ref_desc,
+			p.PACKET_REPOID as ref_repo_id
+		from
+			wms_packet_ref pr, wms_packet p
+		where
+			pr.PACKET_REF_ID = p.PACKET_ID and
+			pr.PACKET_TRACE like concat ('%',#{trace},'%')
+		<if test="status !=null">
+			and p.PACKET_STATUS = #{status}
+		</if>
+		<if test=" repositoryID !=null">
+			and p.PACKET_REPOID = #{repositoryID}
+		</if>
+	</select>
+
+	<insert id="insert">
+		insert into wms_packet_ref(PACKET_TRACE,PACKET_REF_ID)
+		values (#{trace},#{refID})
+	</insert>
+
+	<delete id="deleteByPacketID">
+		delete from wms_packet_ref
+		where PACKET_ID = #{packetDOID}
+	</delete>
+	
+	<delete id="deleteByRefID">
+		delete from wms_packet_ref
+		where PACKET_REF_ID = #{refID}
+	</delete>
+
+</mapper>

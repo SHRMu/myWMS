@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="de.demarks.wms.dao.RepositoryBatchMapper">
+
+	<resultMap type="de.demarks.wms.domain.RepositoryBatch" id="repositoryBatch">
+		<id property="id" column="REPO_BATCH_ID"/>
+		<result property="code" column="REPO_BATCH_CODE"/>
+		<result property="status" column="REPO_BATCH_STATUS"/>
+		<result property="desc" column="REPO_BATCH_DESC"/>
+		<result property="time" column="REPO_BATCH_TIME"/>
+		<result property="repositoryID" column="REPO_BATCH_REPOID"/>
+	</resultMap>
+	
+	<select id="selectAll" resultMap="repositoryBatch">
+		select
+			REPO_BATCH_ID,
+			REPO_BATCH_CODE,
+			REPO_BATCH_STATUS,
+			REPO_BATCH_DESC,
+			REPO_BATCH_TIME,
+			REPO_BATCH_REPOID
+		from
+			wms_repo_batch
+		<if test="repositoryID != null">
+			where REPO_BATCH_REPOID = #{repositoryID}
+		</if>
+	</select>
+	
+	<select id="selectByID" resultMap="repositoryBatch">
+		select
+			REPO_BATCH_ID,
+			REPO_BATCH_CODE,
+			REPO_BATCH_STATUS,
+			REPO_BATCH_DESC,
+			REPO_BATCH_TIME,
+			REPO_BATCH_REPOID
+		from
+			wms_repo_batch
+		where
+			REPO_BATCH_ID = #{batchID}
+		<if test="repositoryID != null">
+			and REPO_BATCH_REPOID = #{repositoryID}
+		</if>
+	</select>
+	
+	<select id="selectByCode" resultMap="repositoryBatch">
+		select
+			REPO_BATCH_ID,
+			REPO_BATCH_CODE,
+			REPO_BATCH_STATUS,
+			REPO_BATCH_DESC,
+			REPO_BATCH_TIME,
+			REPO_BATCH_REPOID
+		from
+			wms_repo_batch
+		where
+			REPO_BATCH_CODE like concat(concat("%",#{batchCode},"%"))
+		<if test="repositoryID != null">
+			and REPO_BATCH_REPOID = #{repositoryID}
+		</if>
+	</select>
+
+	<select id="selectByStatus" resultMap="repositoryBatch">
+		select
+			REPO_BATCH_ID,
+			REPO_BATCH_CODE,
+			REPO_BATCH_STATUS,
+			REPO_BATCH_DESC,
+			REPO_BATCH_TIME,
+			REPO_BATCH_REPOID
+		from
+			wms_repo_batch
+		where
+			REPO_BATCH_STATUS like concat(concat("%",#{status},"%"))
+		<if test="repositoryID != null">
+			and REPO_BATCH_REPOID = #{repositoryID}
+		</if>
+	</select>
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true">
+		insert into wms_repo_batch(REPO_BATCH_CODE,REPO_BATCH_STATUS,REPO_BATCH_DESC,REPO_BATCH_TIME,REPO_BATCH_REPOID)
+		values(#{code},#{status},#{desc},#{time},#{repositoryID})
+	</insert>
+
+	<insert id="insertBatch">
+		insert into wms_repo_batch(REPO_BATCH_CODE,REPO_BATCH_STATUS,REPO_BATCH_DESC,REPO_BATCH_TIME,REPO_BATCH_REPOID)
+		values
+		<foreach collection="list" item="repositoryBatch" separator=",">
+			(#{repositoryBatch.code},#{repositoryBatch.status},#{repositoryBatch.desc},#{repositoryBatch.time},#}{repositoryBatch.repositoryID})
+		</foreach>
+	</insert>
+
+	<update id="update">
+		update
+			wms_repo_batch
+		set
+			REPO_BATCH_CODE = #{code},
+			REPO_BATCH_STATUS = #{status},
+			REPO_BATCH_DESC = #{desc},
+			REPO_BATCH_REPOID = #{repositoryID}
+		where
+			REPO_BATCH_ID = #{id}
+	</update>
+
+	<delete id="deleteByID">
+		delete from wms_repo_batch
+		where REPO_BATCH_ID = #{id}
+	</delete>
+
+</mapper>

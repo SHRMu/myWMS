@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="de.demarks.wms.dao.StockOutMapper">
+	
+	<resultMap type="de.demarks.wms.domain.StockOutDO" id="stockOutDO">
+		<id property="id" column="stockout_id"/>
+		<result property="batchID" column="stockout_batchID" />
+		<result property="batchCode" column="stockout_batchCode" />
+		<result property="customerID" column="stockout_customerID"/>
+		<result property="customerName" column="stockout_customerName"/>
+		<result property="goodsID" column="stockout_goodsID"/>
+		<result property="goodName" column="stockout_goodName"/>
+		<result property="number" column="stockout_number"/>
+		<result property="time" column="stockout_time"/>
+		<result property="personInCharge" column="stockout_personInCharge"/>
+		<result property="repositoryID" column="stockout_repositoryID"/>
+	</resultMap>
+	
+	<select id="selectAll" resultMap="stockOutDO">
+		select
+			r.RECORD_ID as stockout_id,
+			r.RECORD_BATCHID as stockout_batchID,
+			r.RECORD_CUSTOMERID as stockout_customerID,
+			r.RECORD_GOODID as stockout_goodsID,
+			r.RECORD_NUMBER as stockout_number,
+			r.RECORD_TIME as stockout_time,
+			r.RECORD_PERSON as stockout_personInCharge,
+			r.RECORD_REPOSITORYID as stockout_repositoryID,
+			b.REPO_BATCH_CODE as stockout_batchCode,
+			cus.CUSTOMER_NAME as stockout_customerName,
+			g.GOOD_NAME as stockout_goodName
+		from
+			wms_record_out r,wms_repo_batch b, wms_goods g,wms_customer cus, wms_repository repo
+		where
+			r.RECORD_GOODID = g.GOOD_ID and
+			r.RECORD_BATCHID = b.REPO_BATCH_ID and
+			r.RECORD_CUSTOMERID = cus.CUSTOMER_ID and
+			r.RECORD_REPOSITORYID  = repo.REPO_ID
+		<if test="batchID != null ">
+			and r.RECORD_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID !=null">
+			and r.RECORD_REPOSITORYID = #{repositoryID}
+		</if>
+	</select>
+
+	<select id="selectByRecordID" resultMap="stockOutDO">
+		select
+			r.RECORD_ID as stockout_id,
+			r.RECORD_BATCHID as stockout_batchID,
+			r.RECORD_CUSTOMERID as stockout_customerID,
+			r.RECORD_GOODID as stockout_goodsID,
+			r.RECORD_NUMBER as stockout_number,
+			r.RECORD_TIME as stockout_time,
+			r.RECORD_PERSON as stockout_personInCharge,
+			r.RECORD_REPOSITORYID as stockout_repositoryID,
+			b.REPO_BATCH_CODE as stockout_batchCode,
+			cus.CUSTOMER_NAME as stockout_customerName,
+			g.GOOD_NAME as stockout_goodName
+		from
+			wms_record_out r,wms_repo_batch b, wms_goods g,wms_customer cus, wms_repository repo
+		where
+			r.RECORD_GOODID = g.GOOD_ID and
+			r.RECORD_BATCHID = b.REPO_BATCH_ID and
+			r.RECORD_CUSTOMERID = cus.CUSTOMER_ID and
+			r.RECORD_REPOSITORYID  = repo.REPO_ID and
+			r.RECORD_ID = #{recordID}
+	</select>
+
+	<select id="selectByGoodsID" resultMap="stockOutDO">
+		select
+			r.RECORD_ID as stockout_id,
+			r.RECORD_BATCHID as stockout_batchID,
+			r.RECORD_CUSTOMERID as stockout_customerID,
+			r.RECORD_GOODID as stockout_goodsID,
+			r.RECORD_NUMBER as stockout_number,
+			r.RECORD_TIME as stockout_time,
+			r.RECORD_PERSON as stockout_personInCharge,
+			r.RECORD_REPOSITORYID as stockout_repositoryID,
+			b.REPO_BATCH_CODE as stockout_batchCode,
+			cus.CUSTOMER_NAME as stockout_customerName,
+			g.GOOD_NAME as stockout_goodName
+		from
+			wms_record_out r,wms_repo_batch b, wms_goods g,wms_customer cus, wms_repository repo
+		where
+			r.RECORD_GOODID = g.GOOD_ID and
+			r.RECORD_BATCHID = b.REPO_BATCH_ID and
+			r.RECORD_CUSTOMERID = cus.CUSTOMER_ID and
+			r.RECORD_REPOSITORYID  = repo.REPO_ID and
+			r.RECORD_GOODID = #{goodsID}
+		<if test="batchID != null ">
+			and r.RECORD_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID !=null">
+			and r.RECORD_REPOSITORYID = #{repositoryID}
+		</if>
+	</select>
+
+	<select id="selectByGoodsName" resultMap="stockOutDO">
+		select
+			r.RECORD_ID as stockout_id,
+			r.RECORD_BATCHID as stockout_batchID,
+			r.RECORD_CUSTOMERID as stockout_customerID,
+			r.RECORD_GOODID as stockout_goodsID,
+			r.RECORD_NUMBER as stockout_number,
+			r.RECORD_TIME as stockout_time,
+			r.RECORD_PERSON as stockout_personInCharge,
+			r.RECORD_REPOSITORYID as stockout_repositoryID,
+			b.REPO_BATCH_CODE as stockout_batchCode,
+			cus.CUSTOMER_NAME as stockout_customerName,
+			g.GOOD_NAME as stockout_goodName
+		from
+			wms_record_out r,wms_repo_batch b, wms_goods g,wms_customer cus, wms_repository repo
+		where
+			r.RECORD_GOODID = g.GOOD_ID and
+			r.RECORD_BATCHID = b.REPO_BATCH_ID and
+			r.RECORD_CUSTOMERID = cus.CUSTOMER_ID and
+			r.RECORD_REPOSITORYID  = repo.REPO_ID and
+			g.GOOD_NAME = #{goodsName}
+		<if test="batchID !=null">
+			and r.RECORD_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID !=null">
+			and r.RECORD_REPOSITORYID = #{repositoryID}
+		</if>
+	</select>
+
+	<select id="selectByCustomerID" resultMap="stockOutDO">
+		select
+			r.RECORD_ID as stockout_id,
+			r.RECORD_BATCHID as stockout_batchID,
+			r.RECORD_CUSTOMERID as stockout_customerID,
+			r.RECORD_GOODID as stockout_goodsID,
+			r.RECORD_NUMBER as stockout_number,
+			r.RECORD_TIME as stockout_time,
+			r.RECORD_PERSON as stockout_personInCharge,
+			r.RECORD_REPOSITORYID as stockout_repositoryID,
+			b.REPO_BATCH_CODE as stockout_batchCode,
+			cus.CUSTOMER_NAME as stockout_customerName,
+			g.GOOD_NAME as stockout_goodName
+		from
+			wms_record_out r,wms_repo_batch b, wms_goods g,wms_customer cus, wms_repository repo
+		where
+			r.RECORD_GOODID = g.GOOD_ID and
+			r.RECORD_BATCHID = b.REPO_BATCH_ID and
+			r.RECORD_CUSTOMERID = cus.CUSTOMER_ID and
+			r.RECORD_REPOSITORYID  = repo.REPO_ID and
+			r.RECORD_CUSTOMERID = #{customerID}
+		<if test="batchID != null">
+			and r.RECORD_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID !=null">
+			and r.RECORD_REPOSITORYID = #{repositoryID}
+		</if>
+	</select>
+
+	<select id="selectByDate" resultMap="stockOutDO">
+		select
+			r.RECORD_ID as stockout_id,
+			r.RECORD_BATCHID as stockout_batchID,
+			r.RECORD_CUSTOMERID as stockout_customerID,
+			r.RECORD_GOODID as stockout_goodsID,
+			r.RECORD_NUMBER as stockout_number,
+			r.RECORD_TIME as stockout_time,
+			r.RECORD_PERSON as stockout_personInCharge,
+			r.RECORD_REPOSITORYID as stockout_repositoryID,
+			b.REPO_BATCH_CODE as stockout_batchCode,
+			cus.CUSTOMER_NAME as stockout_customerName,
+			g.GOOD_NAME as stockout_goodName
+		from
+			wms_record_out r,wms_repo_batch b, wms_goods g,wms_customer cus, wms_repository repo
+		where
+			r.RECORD_GOODID = g.GOOD_ID and
+			r.RECORD_BATCHID = b.REPO_BATCH_ID and
+			r.RECORD_CUSTOMERID = cus.CUSTOMER_ID and
+			r.RECORD_REPOSITORYID  = repo.REPO_ID
+		<if test="batchID != null ">
+			and r.RECORD_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID > 0">
+			and r.RECORD_REPOSITORYID = #{repositoryID}
+		</if>
+		<if test="startDate != null">
+			and r.RECORD_TIME >= #{startDate}
+		</if>
+		<if test="endDate != null">
+			<![CDATA[and r.RECORD_TIME <= #{endDate}]]>
+		</if>
+	</select>
+		
+	<insert id="insert">
+		insert into wms_record_out(RECORD_BATCHID,RECORD_CUSTOMERID,RECORD_GOODID,RECORD_NUMBER,RECORD_TIME,RECORD_PERSON,RECORD_REPOSITORYID)
+		values(#{batchID},#{customerID},#{goodsID},#{number},#{time},#{personInCharge},#{repositoryID})
+	</insert>
+	
+	<update id="update">
+		update
+			wms_record_out
+		set
+			RECORD_GOODID = #{goodsID},
+			RECORD_BATCHID = #{batchID},
+			RECORD_CUSTOMERID = #{customerID},
+			RECORD_NUMBER = #{number},
+			RECORD_PERSON = #{personInCharge}
+		where
+			RECORD_ID = #{id}
+	</update>
+	
+	<delete id="deleteByRecordID">
+		delete from wms_record_out
+		where RECORD_ID = #{recordID}
+	</delete>
+</mapper>

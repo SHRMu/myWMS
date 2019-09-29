@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="de.demarks.wms.dao.StockInMapper">
+	
+	<resultMap type="de.demarks.wms.domain.StockInDO" id="stockInDO">
+		<id property="id" column="stockin_id"/>
+		<result property="customerID" column="stockin_customerID"/>
+		<result property="customerName" column="stockin_customerName"/>
+		<result property="goodsID" column="stockin_goodsID"/>
+		<result property="goodName" column="stockin_goodName"/>
+		<result property="batchID" column="stockin_batchID" />
+		<result property="batchCode" column="stockin_batchCode"/>
+		<result property="number" column="stockin_number"/>
+		<result property="time" column="stockin_time"/>
+		<result property="personInCharge" column="stockin_personInCharge"/>
+		<result property="repositoryID" column="stockin_repositoryID"/>
+	</resultMap>
+	
+	<select id="selectAll" resultMap="stockInDO">
+		select
+			r.RECORD_ID as stockin_id,
+			r.RECORD_CUSTOMERID as stockin_customerID,
+			r.RECORD_GOODID as stockin_goodsID,
+			r.RECORD_BATCHID as stockin_batchID,
+			r.RECORD_NUMBER as stockin_number,
+			r.RECORD_TIME as stockin_time,
+			r.RECORD_PERSON as stockin_personInCharge,
+			r.RECORD_REPOSITORYID as stockin_repositoryID,
+			g.GOOD_NAME as stockin_goodName,
+			b.REPO_BATCH_CODE as stockin_batchCode,
+			cus.CUSTOMER_NAME as stockin_customerName
+		from
+			wms_record_in r, wms_customer cus, wms_goods g, wms_repo_batch b, wms_repository rep
+		where
+			r.RECORD_GOODID = g.GOOD_ID and
+			r.RECORD_BATCHID = b.REPO_BATCH_ID and
+			r.RECORD_CUSTOMERID = cus.CUSTOMER_ID and
+			r.RECORD_REPOSITORYID = rep.REPO_ID
+		<if test="batchID !=null">
+			and r.RECORD_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID !=null">
+			and r.RECORD_REPOSITORYID = #{repositoryID}
+		</if>
+	</select>
+
+	<select id="selectByRecordID" resultMap="stockInDO">
+		select
+			r.RECORD_ID as stockin_id,
+			r.RECORD_CUSTOMERID as stockin_customerID,
+			r.RECORD_GOODID as stockin_goodsID,
+			r.RECORD_BATCHID as stockin_batchID,
+			r.RECORD_NUMBER as stockin_number,
+			r.RECORD_TIME as stockin_time,
+			r.RECORD_PERSON as stockin_personInCharge,
+			r.RECORD_REPOSITORYID as stockin_repositoryID,
+			g.GOOD_NAME as stockin_goodName,
+			b.REPO_BATCH_CODE as stockin_batchCode,
+			cus.CUSTOMER_NAME as stockin_customerName
+		from
+			wms_record_in r, wms_customer cus, wms_goods g, wms_repo_batch b, wms_repository rep
+		where
+			r.RECORD_GOODID = g.GOOD_ID and
+			r.RECORD_BATCHID = b.REPO_BATCH_ID and
+			r.RECORD_CUSTOMERID = cus.CUSTOMER_ID and
+			r.RECORD_REPOSITORYID = rep.REPO_ID and
+			r.RECORD_ID = #{recordID}
+	</select>
+
+	<select id="selectByGoodsID" resultMap="stockInDO">
+		select
+			r.RECORD_ID as stockin_id,
+			r.RECORD_CUSTOMERID as stockin_customerID,
+			r.RECORD_GOODID as stockin_goodsID,
+			r.RECORD_BATCHID as stockin_batchID,
+			r.RECORD_NUMBER as stockin_number,
+			r.RECORD_TIME as stockin_time,
+			r.RECORD_PERSON as stockin_personInCharge,
+			r.RECORD_REPOSITORYID as stockin_repositoryID,
+			g.GOOD_NAME as stockin_goodName,
+			b.REPO_BATCH_CODE as stockin_batchCode,
+			cus.CUSTOMER_NAME as stockin_customerName
+		from
+			wms_record_in r, wms_customer cus, wms_goods g, wms_repo_batch b, wms_repository rep
+		where
+			r.RECORD_GOODID = g.GOOD_ID and
+			r.RECORD_BATCHID = b.REPO_BATCH_ID and
+			r.RECORD_CUSTOMERID = cus.CUSTOMER_ID and
+			r.RECORD_REPOSITORYID = rep.REPO_ID and
+			r.RECORD_GOODID = #{goodsID}
+		<if test="batchID !=null">
+			and r.RECORD_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID !=null">
+			and r.RECORD_REPOSITORYID = #{repositoryID}
+		</if>
+	</select>
+
+	<select id="selectByGoodsName" resultMap="stockInDO">
+		select
+			r.RECORD_ID as stockin_id,
+			r.RECORD_CUSTOMERID as stockin_customerID,
+			r.RECORD_GOODID as stockin_goodsID,
+			r.RECORD_BATCHID as stockin_batchID,
+			r.RECORD_NUMBER as stockin_number,
+			r.RECORD_TIME as stockin_time,
+			r.RECORD_PERSON as stockin_personInCharge,
+			r.RECORD_REPOSITORYID as stockin_repositoryID,
+			g.GOOD_NAME as stockin_goodName,
+			b.REPO_BATCH_CODE as stockin_batchCode,
+			cus.CUSTOMER_NAME as stockin_customerName
+		from
+			wms_record_in r, wms_customer cus, wms_goods g, wms_repo_batch b, wms_repository rep
+		where
+			r.RECORD_GOODID = g.GOOD_ID and
+			r.RECORD_BATCHID = b.REPO_BATCH_ID and
+			r.RECORD_CUSTOMERID = cus.CUSTOMER_ID and
+			r.RECORD_REPOSITORYID = rep.REPO_ID and
+			g.GOOD_NAME like concat ('%',#{goodsName},'%')
+		<if test="batchID !=null">
+			and r.RECORD_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID !=null">
+			and r.RECORD_REPOSITORYID = #{repositoryID}
+		</if>
+	</select>
+
+	<select id="selectByCustomerID" resultMap="stockInDO">
+		select
+			r.RECORD_ID as stockin_id,
+			r.RECORD_CUSTOMERID as stockin_customerID,
+			r.RECORD_GOODID as stockin_goodsID,
+			r.RECORD_BATCHID as stockin_batchID,
+			r.RECORD_NUMBER as stockin_number,
+			r.RECORD_TIME as stockin_time,
+			r.RECORD_PERSON as stockin_personInCharge,
+			r.RECORD_REPOSITORYID as stockin_repositoryID,
+			g.GOOD_NAME as stockin_goodName,
+			b.REPO_BATCH_CODE as stockin_batchCode,
+			cus.CUSTOMER_NAME as stockin_customerName
+		from
+			wms_record_in r, wms_customer cus, wms_goods g, wms_repo_batch b, wms_repository rep
+		where
+			r.RECORD_GOODID = g.GOOD_ID and
+			r.RECORD_BATCHID = b.REPO_BATCH_ID and
+			r.RECORD_CUSTOMERID = cus.CUSTOMER_ID and
+			r.RECORD_REPOSITORYID = rep.REPO_ID and
+			r.RECORD_GOODID = #{customerID}
+		<if test="batchID !=null">
+			and r.RECORD_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID !=null">
+			and r.RECORD_REPOSITORYID = #{repositoryID}
+		</if>
+	</select>
+
+	<select id="selectByDate" resultMap="stockInDO">
+		select
+			r.RECORD_ID as stockin_id,
+			r.RECORD_CUSTOMERID as stockin_customerID,
+			r.RECORD_GOODID as stockin_goodsID,
+			r.RECORD_BATCHID as stockin_batchID,
+			r.RECORD_NUMBER as stockin_number,
+			r.RECORD_TIME as stockin_time,
+			r.RECORD_PERSON as stockin_personInCharge,
+			r.RECORD_REPOSITORYID as stockin_repositoryID,
+			g.GOOD_NAME as stockin_goodName,
+			b.REPO_BATCH_CODE as stockin_batchCode,
+			cus.CUSTOMER_NAME as stockin_customerName
+		from
+			wms_record_in r, wms_customer cus, wms_goods g, wms_repo_batch b, wms_repository rep
+		where
+			r.RECORD_GOODID = g.GOOD_ID and
+			r.RECORD_BATCHID = b.REPO_BATCH_ID and
+			r.RECORD_CUSTOMERID = cus.CUSTOMER_ID and
+			r.RECORD_REPOSITORYID = rep.REPO_ID
+		<if test="batchID != null">
+			and r.RECORD_BATCHID = #{batchID}
+		</if>
+        <if test="repositoryID != null ">
+            and r.RECORD_REPOSITORYID = #{repositoryID}
+        </if>
+        <if test="startDate != null">
+            and r.RECORD_TIME >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            <![CDATA[and r.RECORD_TIME <= #{endDate}]]>
+        </if>
+	</select>
+	
+	<insert id="insert">
+		insert into wms_record_in(RECORD_BATCHID,RECORD_CUSTOMERID,RECORD_GOODID,RECORD_NUMBER,RECORD_TIME,RECORD_PERSON,RECORD_REPOSITORYID)
+		values(#{batchID},#{customerID},#{goodsID},#{number},#{time},#{personInCharge},#{repositoryID})
+	</insert>
+	
+	<update id="update">
+		update 
+			wms_record_in
+		set
+			RECORD_GOODID = #{goodsID},
+			RECORD_BATCHID = #{batchID},
+			RECORD_CUSTOMERID = #{customerID},
+			RECORD_NUMBER = #{number},
+			RECORD_TIME = #{time},
+			RECORD_PERSON = #{personInCharge},
+			RECORD_REPOSITORYID = #{repositoryID}
+		where
+			RECORD_ID = #{id}
+	</update>
+	
+	<delete id="deleteByRecordID">
+		delete from wms_record_in
+		where RECORD_ID = #{recordID}
+	</delete>
+</mapper>

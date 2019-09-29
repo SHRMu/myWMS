@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="de.demarks.wms.dao.DetectMapper">
+
+    <resultMap type="de.demarks.wms.domain.DetectDO" id="detectDO">
+        <id property="id" column="detect_id"/>
+        <result property="goodsID" column="detect_goodsID"/>
+        <result property="goodsName" column="detect_goodsName" />
+        <result property="batchID" column="detect_batchID"/>
+        <result property="batchCode" column="detect_batchCode" />
+        <result property="repositoryID" column="detect_repositoryID"/>
+        <result property="number" column="detect_number" />
+        <result property="passed" column="detect_passed"/>
+        <result property="scratch" column="detect_scratch"/>
+        <result property="damage" column="detect_damage" />
+        <result property="time" column="detect_time"/>
+        <result property="personInCharge" column="detect_personInCharge"/>
+		<result property="desc" column="detect_desc"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="detectDO">
+        select
+			d.DETECT_ID as detect_id,
+			d.DETECT_GOODID as detect_goodsID,
+			d.DETECT_BATCHID as detect_batchID,
+			d.DETECT_REPOSITORYID as detect_repositoryID,
+			d.DETECT_NUMBER as detect_number,
+			d.DETECT_PASSED as detect_passed,
+			d.DETECT_SCRATCH as detect_scratch,
+			d.DETECT_DAMAGE as detect_damage,
+			d.DETECT_TIME as detect_time,
+			d.DETECT_PERSON as detect_personInCharge,
+			d.DETECT_DESC as detect_desc,
+			g.GOOD_NAME as detect_goodsName,
+			b.REPO_BATCH_CODE as detect_batchCode
+		from
+			wms_detect d, wms_repo_batch b, wms_goods g, wms_repository r
+		where
+			d.DETECT_GOODID = g.GOOD_ID and
+			d.DETECT_BATCHID = b.REPO_BATCH_ID and
+			d.DETECT_REPOSITORYID = r.REPO_ID
+		<if test="batchID !=null">
+			and d.DETECT_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID != null">
+			and d.DETECT_REPOSITORYID = #{repositoryID}
+		</if>
+    </select>
+
+	<select id="selectByRecordID" resultMap="detectDO">
+		select
+			d.DETECT_ID as detect_id,
+			d.DETECT_GOODID as detect_goodsID,
+			d.DETECT_BATCHID as detect_batchID,
+			d.DETECT_REPOSITORYID as detect_repositoryID,
+			d.DETECT_NUMBER as detect_number,
+			d.DETECT_PASSED as detect_passed,
+			d.DETECT_SCRATCH as detect_scratch,
+			d.DETECT_DAMAGE as detect_damage,
+			d.DETECT_TIME as detect_time,
+			d.DETECT_PERSON as detect_personInCharge,
+			d.DETECT_DESC as detect_desc,
+			g.GOOD_NAME as detect_goodsName,
+			b.REPO_BATCH_CODE as detect_batchCode
+		from
+			wms_detect d, wms_repo_batch b, wms_goods g, wms_repository r
+		where
+			d.DETECT_GOODID = g.GOOD_ID and
+			d.DETECT_BATCHID = b.REPO_BATCH_ID and
+			d.DETECT_REPOSITORYID = r.REPO_ID and
+			d.DETECT_ID = #{recordID}
+	</select>
+
+	<select id="selectByDate" resultMap="detectDO">
+		select
+			d.DETECT_ID as detect_id,
+			d.DETECT_GOODID as detect_goodsID,
+			d.DETECT_BATCHID as detect_batchID,
+			d.DETECT_REPOSITORYID as detect_repositoryID,
+			d.DETECT_NUMBER as detect_number,
+			d.DETECT_PASSED as detect_passed,
+			d.DETECT_SCRATCH as detect_scratch,
+			d.DETECT_DAMAGE as detect_damage,
+			d.DETECT_TIME as detect_time,
+			d.DETECT_PERSON as detect_personInCharge,
+			d.DETECT_DESC as detect_desc,
+			g.GOOD_NAME as detect_goodsName,
+			b.REPO_BATCH_CODE as detect_batchCode
+		from
+			wms_detect d, wms_repo_batch b, wms_goods g, wms_repository r
+		where
+			d.DETECT_GOODID = g.GOOD_ID and
+			d.DETECT_BATCHID = b.REPO_BATCH_ID and
+			d.DETECT_REPOSITORYID = r.REPO_ID
+		<if test="batchID !=null">
+			and d.DETECT_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID != null">
+			and d.DETECT_REPOSITORYID = #{repositoryID}
+		</if>
+		<if test="startDate != null">
+			and d.DETECT_TIME >= #{startDate}
+		</if>
+		<if test="endDate != null">
+			<![CDATA[and d.DETECT_TIME <= #{endDate}]]>
+		</if>
+	</select>
+
+	<select id="selectByGoodsID" resultMap="detectDO">
+		select
+			d.DETECT_ID as detect_id,
+			d.DETECT_GOODID as detect_goodsID,
+			d.DETECT_BATCHID as detect_batchID,
+			d.DETECT_REPOSITORYID as detect_repositoryID,
+			d.DETECT_NUMBER as detect_number,
+			d.DETECT_PASSED as detect_passed,
+			d.DETECT_SCRATCH as detect_scratch,
+			d.DETECT_DAMAGE as detect_damage,
+			d.DETECT_TIME as detect_time,
+			d.DETECT_PERSON as detect_personInCharge,
+			d.DETECT_DESC as detect_desc,
+			g.GOOD_NAME as detect_goodsName,
+			b.REPO_BATCH_CODE as detect_batchCode
+		from
+			wms_detect d, wms_repo_batch b, wms_goods g, wms_repository r
+		where
+			d.DETECT_GOODID = g.GOOD_ID and
+			d.DETECT_BATCHID = b.REPO_BATCH_ID and
+			d.DETECT_REPOSITORYID = r.REPO_ID and
+			d.DETECT_GOODID = #{goodsID}
+		<if test="batchID != null">
+			and d.DETECT_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID != null ">
+			and d.DETECT_REPOSITORYID = #{repositoryID}
+		</if>
+		<if test="startDate != null">
+			and d.DETECT_TIME >= #{startDate}
+		</if>
+		<if test="endDate != null">
+			<![CDATA[and d.DETECT_TIME <= #{endDate}]]>
+		</if>
+	</select>
+
+	<select id="selectByGoodsName" resultMap="detectDO">
+		select
+			d.DETECT_ID as detect_id,
+			d.DETECT_GOODID as detect_goodsID,
+			d.DETECT_BATCHID as detect_batchID,
+			d.DETECT_REPOSITORYID as detect_repositoryID,
+			d.DETECT_NUMBER as detect_number,
+			d.DETECT_PASSED as detect_passed,
+			d.DETECT_SCRATCH as detect_scratch,
+			d.DETECT_DAMAGE as detect_damage,
+			d.DETECT_TIME as detect_time,
+			d.DETECT_PERSON as detect_personInCharge,
+			d.DETECT_DESC as detect_desc,
+			g.GOOD_NAME as detect_goodsName,
+			b.REPO_BATCH_CODE as detect_batchCode
+		from
+			wms_detect d, wms_repo_batch b, wms_goods g, wms_repository r
+		where
+			d.DETECT_GOODID = g.GOOD_ID and
+			d.DETECT_BATCHID = b.REPO_BATCH_ID and
+			d.DETECT_REPOSITORYID = r.REPO_ID and
+			g.GOOD_NAME like concat ('%',#{goodsName},'%')
+		<if test="batchID != null">
+			and d.DETECT_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID != null ">
+			and d.DETECT_REPOSITORYID = #{repositoryID}
+		</if>
+		<if test="startDate != null">
+			and d.DETECT_TIME >= #{startDate}
+		</if>
+		<if test="endDate != null">
+			<![CDATA[and d.DETECT_TIME <= #{endDate}]]>
+		</if>
+	</select>
+
+    <insert id="insert">
+		insert into wms_detect
+		(
+			DETECT_GOODID,
+			DETECT_BATCHID,
+			DETECT_REPOSITORYID,
+			DETECT_NUMBER,
+			DETECT_PASSED,
+			DETECT_SCRATCH,
+			DETECT_DAMAGE,
+			DETECT_TIME,
+			DETECT_PERSON,
+			DETECT_DESC
+		)
+		values
+		(
+			#{goodsID},
+			#{batchID},
+			#{repositoryID},
+			#{number},
+			#{passed},
+			#{scratch},
+			#{damage},
+			#{time},
+			#{personInCharge},
+			#{desc}
+		)
+	</insert>
+
+	<update id="update">
+		update
+			wms_detect
+		set
+			DETECT_GOODID = #{goodsID},
+			DETECT_BATCHID = #{batchID},
+			DETECT_REPOSITORYID = #{repositoryID},
+			DETECT_NUMBER = #{number},
+			DETECT_PASSED = #{passed},
+			DETECT_SCRATCH = #{scratch},
+			DETECT_DAMAGE = #{damage},
+			DETECT_TIME = #{time},
+			DETECT_PERSON = #{personInCharge},
+			DETECT_DESC = #{desc}
+		where
+			DETECT_ID = #{id}
+	</update>
+
+	<delete id="deleteByRecordID">
+		delete from wms_detect
+		where DETECT_ID = #{recordID}
+	</delete>
+
+</mapper>

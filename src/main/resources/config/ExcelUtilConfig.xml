@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+	<entity class="de.demarks.wms.domain.PacketUp">
+		<property>
+			<field>trace</field>
+			<value>包裹运单号</value>
+		</property>
+		<property>
+			<field>desc</field>
+			<value>子运单号</value>
+		</property>
+	</entity>
+
+	<entity class="de.demarks.wms.domain.PacketDO">
+		<property>
+			<field>id</field>
+			<value>包裹ID号</value>
+		</property>
+		<property>
+			<field>trace</field>
+			<value>包裹运单号</value>
+		</property>
+		<property>
+			<field>desc</field>
+			<value>子运单号</value>
+		</property>
+	</entity>
+
+	<entity class="de.demarks.wms.domain.Goods">
+		<property>
+			<field>id</field>
+			<value>货物ID</value>
+		</property>
+		<property>
+			<field>name</field>
+			<value>货物名称</value>
+		</property>
+	</entity>
+
+	<entity class="de.demarks.wms.domain.PacketStorage">
+		<property>
+			<field>packetID</field>
+			<value>包裹ID号</value>
+		</property>
+		<property>
+			<field>packetTrace</field>
+			<value>包裹运单号</value>
+		</property>
+		<property>
+			<field>goodsID</field>
+			<value>货物ID号</value>
+		</property>
+		<property>
+			<field>goodsName</field>
+			<value>货物名称</value>
+		</property>
+		<property>
+			<field>number</field>
+			<value>预报数量</value>
+		</property>
+
+	</entity>
+
+	<entity class="de.demarks.wms.domain.StockStorage">
+		<property>
+			<field>goodsID</field>
+			<value>货物ID</value>
+		</property>
+		<property>
+			<field>goodsName</field>
+			<value>货物名称</value>
+		</property>
+		<property>
+			<field>goodsSize</field>
+			<value>货物规格</value>
+		</property>
+		<property>
+			<field>goodsType</field>
+			<value>货物类型</value>
+		</property>
+		<property>
+			<field>goodsValue</field>
+			<value>货物价值</value>
+		</property>
+		<property>
+			<field>repositoryID</field>
+			<value>仓库ID</value>
+		</property>
+		<property>
+			<field>number</field>
+			<value>库存数量</value>
+		</property>
+	</entity>
+</configuration>

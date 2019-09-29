@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="de.demarks.wms.dao.DetectStorageMapper">
+	
+	<!-- 结果映射 -->
+	<resultMap type="de.demarks.wms.domain.DetectStorage" id="detectStorage">
+		<id property="goodsID" column="detectSto_goodsID"/>
+		<id property="batchID" column="detectSto_batchID"/>
+		<result property="goodsName" column="detectSto_goodsName" />
+		<result property="batchCode" column="detectSto_batchCode" />
+		<result property="repositoryID" column="detectSto_repositoryID"/>
+		<result property="number" column="detectSto_number" />
+		<result property="passed" column="detectSto_passed"/>
+		<result property="scratch" column="detectSto_scratch"/>
+		<result property="damage" column="detectSto_damage"/>
+		<!--
+		<association property="goodsInfo" javaType="com.ken.Goods" resultMap="goods"/>
+		 -->
+	</resultMap>
+	 
+	<select id="selectAll" resultMap="detectStorage">
+		select
+			ds.DETECT_GOODID as detectSto_goodsID,
+			ds.DETECT_BATCHID as detectSto_batchID,
+			ds.DETECT_REPOSITORY as detectSto_repositoryID,
+			ds.DETECT_NUMBER as detectSto_number,
+			ds.DETECT_PASSED as detectSto_passed,
+			ds.DETECT_SCRATCH as detectSto_scratch,
+			ds.DETECT_DAMAGE as detectSto_damage,
+			g.GOOD_NAME as detectSto_goodsName,
+			b.REPO_BATCH_CODE as detectSto_batchCode
+		from
+			wms_detect_storage ds, wms_goods g, wms_repo_batch b, wms_repository r
+		where
+		 	ds.DETECT_GOODID = g.GOOD_ID and
+		 	ds.DETECT_BATCHID = b.REPO_BATCH_ID and
+		 	ds.DETECT_REPOSITORY = r.REPO_ID
+		<if test="batchID != null">
+			and ds.DETECT_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID != null">
+			and ds.DETECT_REPOSITORY = #{repositoryID}
+		</if>
+	</select>
+	
+	<select id="selectByGoodsID" resultMap="detectStorage">
+		select
+			ds.DETECT_GOODID as detectSto_goodsID,
+			ds.DETECT_BATCHID as detectSto_batchID,
+			ds.DETECT_REPOSITORY as detectSto_repositoryID,
+			ds.DETECT_NUMBER as detectSto_number,
+			ds.DETECT_PASSED as detectSto_passed,
+			ds.DETECT_SCRATCH as detectSto_scratch,
+			ds.DETECT_DAMAGE as detectSto_damage,
+			g.GOOD_NAME as detectSto_goodsName,
+			b.REPO_BATCH_CODE as detectSto_batchCode
+		from
+			wms_detect_storage ds, wms_goods g, wms_repo_batch b, wms_repository r
+		where
+			ds.DETECT_GOODID = g.GOOD_ID and
+			ds.DETECT_BATCHID = b.REPO_BATCH_ID and
+			ds.DETECT_REPOSITORY = r.REPO_ID and
+			ds.DETECT_GOODID = #{goodsID}
+		<if test="batchID != null">
+			and ds.DETECT_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID != null">
+			and ds.DETECT_REPOSITORY = #{repositoryID}
+		</if>
+	</select>
+
+	<select id="selectByGoodsName" resultMap="detectStorage">
+		select
+			ds.DETECT_GOODID as detectSto_goodsID,
+			ds.DETECT_BATCHID as detectSto_batchID,
+			ds.DETECT_REPOSITORY as detectSto_repositoryID,
+			ds.DETECT_NUMBER as detectSto_number,
+			ds.DETECT_PASSED as detectSto_passed,
+			ds.DETECT_SCRATCH as detectSto_scratch,
+			ds.DETECT_DAMAGE as detectSto_damage,
+			g.GOOD_NAME as detectSto_goodsName,
+			b.REPO_BATCH_CODE as detectSto_batchCode
+		from
+			wms_detect_storage ds, wms_goods g, wms_repo_batch b, wms_repository r
+		where
+			ds.DETECT_GOODID = g.GOOD_ID and
+			ds.DETECT_BATCHID = b.REPO_BATCH_ID and
+			ds.DETECT_REPOSITORY = r.REPO_ID and
+			g.GOOD_NAME like concat("%",concat(#{goodsName},"%"))
+		<if test="batchID != null">
+			and ds.DETECT_BATCHID = #{batchID}
+		</if>
+		<if test="repositoryID != null">
+			and ds.DETECT_REPOSITORY = #{repositoryID}
+		</if>
+	</select>
+
+	<insert id="insert">
+		insert into wms_detect_storage
+		(
+			DETECT_GOODID,
+			DETECT_BATCHID,
+			DETECT_REPOSITORY,
+			DETECT_NUMBER,
+			DETECT_PASSED,
+			DETECT_SCRATCH,
+			DETECT_DAMAGE
+		)
+		values
+		(
+			#{goodsID},
+			#{batchID},
+			#{repositoryID},
+			#{number},
+			#{passed},
+			#{scratch},
+			#{damage}
+		)
+	</insert>
+
+	<insert id="insertBatch">
+		insert into wms_detect_storage(DETECT_GOODID,DETECT_BATCHID,DETECT_REPOSITORY,DETECT_NUMBER,DETECT_PASSED,DETECT_SCRATCH,DETECT_DAMAGE)
+		values
+		<foreach collection="list" item="detectStorage" separator=",">
+			(
+			#{detectStorage.goodsID},#{detectStorage.batchID},#{detectStorage.repositoryID},
+			#{detectStorage.number},#{detectStorage.passed},#{detectStorage.scratch},#{detectStorage.damage}
+			)
+		</foreach>
+	</insert>
+
+	<update id="update">
+		update
+			wms_detect_storage
+		set
+			DETECT_NUMBER = #{number},
+			DETECT_PASSED = #{passed},
+			DETECT_SCRATCH = #{scratch},
+			DETECT_DAMAGE = #{damage}
+		where
+			DETECT_GOODID = #{goodsID} and
+			DETECT_BATCHID = #{batchID} and
+			DETECT_REPOSITORY = #{repositoryID}
+	</update>
+
+	<delete id="delete">
+		delete from wms_detect_storage
+		where
+			DETECT_GOODID = #{goodsID} and
+			DETECT_BATCHID = #{batchID} and
+			DETECT_REPOSITORY = #{repositoryID}
+	</delete>
+
+	<delete id="deleteByID">
+		delete from wms_detect_storage
+		where
+			DETECT_GOODID = #{goodsID} and
+			DETECT_BATCHID = #{batchID} and
+			DETECT_REPOSITORY = #{repositoryID}
+	</delete>
+
+</mapper>

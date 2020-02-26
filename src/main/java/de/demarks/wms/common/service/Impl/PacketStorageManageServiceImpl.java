@@ -6,12 +6,9 @@ import de.demarks.wms.common.service.Interface.*;
 import de.demarks.wms.common.util.ExcelUtil;
 import de.demarks.wms.dao.*;
 import de.demarks.wms.domain.*;
-import de.demarks.wms.exception.PacketManageServiceException;
 import de.demarks.wms.exception.PacketStorageManageServiceException;
-import de.demarks.wms.exception.PreStockManageServiceException;
 import de.demarks.wms.util.aop.UserOperation;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +30,7 @@ public class PacketStorageManageServiceImpl implements PacketStorageManageServic
     @Autowired
     private ExcelUtil excelUtil;
     @Autowired
-    private PacketMapper packetMapper;
+    private PacketInMapper packetInMapper;
     @Autowired
     private GoodsMapper goodsMapper;
     @Autowired
@@ -301,7 +298,7 @@ public class PacketStorageManageServiceImpl implements PacketStorageManageServic
             boolean isAvailable = true;
 
             // validate
-            PacketDO packetDO = packetMapper.selectByPacketID(packetID);
+            PacketInDO packetDO = packetInMapper.selectByPacketID(packetID);
             Goods goods = goodsMapper.selectById(goodsID);
             Repository repository = repositoryMapper.selectByID(repositoryID);
             if (packetDO == null)
@@ -410,7 +407,7 @@ public class PacketStorageManageServiceImpl implements PacketStorageManageServic
                 PacketStorage packetStorage;
                 boolean isAvailable;
                 List<PacketStorage> availableList = new ArrayList<>();
-                PacketDO packetDO;
+                PacketInDO packetDO;
                 Goods goods;
                 RepositoryBatch repositoryBatch;
                 Repository repository;
@@ -419,7 +416,7 @@ public class PacketStorageManageServiceImpl implements PacketStorageManageServic
                     packetStorage = (PacketStorage) object;
 
                     // validate
-                    packetDO = packetMapper.selectByPacketID(packetStorage.getPacketID());
+                    packetDO = packetInMapper.selectByPacketID(packetStorage.getPacketID());
                     goods = goodsMapper.selectById(packetStorage.getGoodsID());
                     repository = repositoryMapper.selectByID(packetStorage.getRepositoryID());
                     if (packetDO == null)

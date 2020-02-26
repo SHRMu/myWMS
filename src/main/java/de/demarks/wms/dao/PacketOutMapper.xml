@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="de.demarks.wms.dao.PacketOutMapper">
+
+	<resultMap type="de.demarks.wms.domain.PacketOutDO" id="packetOutDO">
+		<id property="id" column="PACKET_OUT_ID"/>
+		<result property="trace" column="PACKET_OUT_TRACE"/>
+		<result property="time" column="PACKET_OUT_TIME"/>
+		<result property="status" column="PACKET_OUT_STATUS"/>
+		<result property="desc" column="PACKET_OUT_DESC"/>
+		<result property="customerID" column="PACKET_OUT_CUSTOMERID"/>
+		<result property="repositoryID" column="PACKET_OUT_REPOID"/>
+	</resultMap>
+
+	<select id="selectAll" resultMap="packetOutDO">
+		select
+			p.PACKET_OUT_ID,
+			p.PACKET_OUT_TRACE,
+			p.PACKET_OUT_TIME,
+			p.PACKET_OUT_STATUS,
+			p.PACKET_OUT_DESC,
+			p.PACKET_OUT_CUSTOMERID,
+			p.PACKET_OUT_REPOID
+		from
+			wms_packet_out p, wms_customer c, wms_repository r
+		where
+			p.PACKET_OUT_CUSTOMERID = c.CUSTOMER_ID and
+			p.PACKET_OUT_REPOID = r.REPO_ID
+		<if test="customerID !=null">
+			and p.PACKET_OUT_CUSTOMERID = #{customerID}
+		</if>
+		<if test="repositoryID !=null">
+			and p.PACKET_OUT_REPOID = #{repositoryID}
+		</if>
+	</select>
+	
+	<select id="selectByPacketID" resultMap="packetOutDO">
+		select
+			p.PACKET_OUT_ID,
+			p.PACKET_OUT_TRACE,
+			p.PACKET_OUT_TIME,
+			p.PACKET_OUT_STATUS,
+			p.PACKET_OUT_DESC,
+			p.PACKET_OUT_CUSTOMERID,
+			p.PACKET_OUT_REPOID
+		from
+			wms_packet_out p, wms_customer c, wms_repository r
+		where
+			p.PACKET_OUT_CUSTOMERID = c.CUSTOMER_ID and
+			p.PACKET_OUT_REPOID = r.REPO_ID and
+			p.PACKET_OUT_ID = #{packetID}
+	</select>
+
+	<select id="selectByTraceApproximate" resultMap="packetOutDO">
+		select
+			p.PACKET_OUT_ID,
+			p.PACKET_OUT_TRACE,
+			p.PACKET_OUT_TIME,
+			p.PACKET_OUT_STATUS,
+			p.PACKET_OUT_DESC,
+			p.PACKET_OUT_CUSTOMERID,
+			p.PACKET_OUT_REPOID
+		from
+			wms_packet_out p, wms_customer c, wms_repository r
+		where
+			p.PACKET_OUT_CUSTOMERID = c.CUSTOMER_ID and
+			p.PACKET_OUT_REPOID = r.REPO_ID and
+			p.PACKET_OUT_TRACE like concat ('%',#{trace},'%')
+		<if test="status !=null">
+			and p.PACKET_OUT_STATUS = #{status}
+		</if>
+		<if test="customerID !=null">
+			and p.PACKET_OUT_CUSTOMERID = #{customerID}
+		</if>
+		<if test="repositoryID !=null">
+			and p.PACKET_OUT_REPOID = #{repositoryID}
+		</if>
+	</select>
+	
+	<select id="selectByDate" resultMap="packetOutDO">
+		select
+			p.PACKET_OUT_ID,
+			p.PACKET_OUT_TRACE,
+			p.PACKET_OUT_TIME,
+			p.PACKET_OUT_STATUS,
+			p.PACKET_OUT_DESC,
+			p.PACKET_OUT_CUSTOMERID,
+			p.PACKET_OUT_REPOID
+		from
+			wms_packet_out p, wms_customer c, wms_repository r
+		where
+			p.PACKET_OUT_CUSTOMERID = c.CUSTOMER_ID and
+			p.PACKET_OUT_REPOID = r.REPO_ID
+		<if test="customerID != null">
+			and p.PACKET_OUT_CUSTOMERID = #{customerID}
+		</if>
+		<if test="repositoryID != null ">
+			and p.PACKET_OUT_REPOID = #{repositoryID}
+		</if>
+		<if test="startDate != null">
+			and p.PACKET_OUT_TIME >= #{startDate}
+		</if>
+		<if test="endDate != null">
+			<![CDATA[and p.PACKET_OUT_TIME <= #{endDate}]]>
+		</if>
+	</select>
+
+	<insert id="insert">
+		insert into wms_packet_out(PACKET_OUT_TRACE,PACKET_OUT_TIME,PACKET_OUT_STATUS,PACKET_OUT_DESC,PACKET_OUT_CUSTOMERID,PACKET_OUT_REPOID)
+		values (#{trace},#{time},#{status},#{desc},#{customerID},#{repositoryID})
+	</insert>
+	
+	<insert id="insertBatch">
+		insert into wms_packet_out(PACKET_OUT_TRACE,PACKET_OUT_TIME,PACKET_OUT_STATUS,PACKET_OUT_DESC,PACKET_OUT_CUSTOMERID,PACKET_OUT_REPOID)
+		values
+		<foreach collection="list" item="packetDO" separator=",">
+			(#{packetDO.trace},#{packetDO.time},#{packetDO.status},#{packetDO.desc},#{packetDO.customerID},#{packetDO.repositoryID})
+		</foreach>
+	</insert>
+
+	<update id="update">
+		update
+			wms_packet_out
+		set
+			PACKET_OUT_TRACE = #{trace},
+			PACKET_OUT_STATUS = #{status},
+			PACKET_OUT_DESC = #{desc},
+			PACKET_OUT_CUSTOMERID = #{customerID},
+			PACKET_OUT_REPOID = #{repositoryID}
+		where
+			PACKET_OUT_ID = #{id}
+	</update>
+
+	<delete id="deleteByPacketID">
+		delete from wms_packet_out
+		where PACKET_OUT_ID = #{packetID}
+	</delete>
+
+</mapper>

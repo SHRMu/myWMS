@@ -3,9 +3,9 @@ package de.demarks.wms.common.service.Impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import de.demarks.wms.common.service.Interface.PacketRefMangeService;
-import de.demarks.wms.dao.PacketMapper;
+import de.demarks.wms.dao.PacketInMapper;
 import de.demarks.wms.dao.PacketRefMapper;
-import de.demarks.wms.domain.PacketDO;
+import de.demarks.wms.domain.PacketInDO;
 import de.demarks.wms.domain.PacketDTO;
 import de.demarks.wms.domain.PacketRef;
 import de.demarks.wms.exception.PacketManageServiceException;
@@ -24,7 +24,7 @@ import java.util.Map;
 public class PacketRefManageServiceImpl implements PacketRefMangeService {
 
     @Autowired
-    private PacketMapper packetMapper;
+    private PacketInMapper packetInMapper;
     @Autowired
     private PacketRefMapper packetRefMapper;
 
@@ -83,7 +83,7 @@ public class PacketRefManageServiceImpl implements PacketRefMangeService {
      * @throws PacketManageServiceException
      */
     @Override
-    public boolean addPacketRef(PacketDO packetDO) throws PacketManageServiceException {
+    public boolean addPacketRef(PacketInDO packetDO) throws PacketManageServiceException {
         try{
             if ( packetDO != null){
                 Integer refID = packetDO.getId(); //主单号
@@ -117,7 +117,7 @@ public class PacketRefManageServiceImpl implements PacketRefMangeService {
     }
 
     @Override
-    public boolean updatePacketRef(PacketDO packetDO) throws PacketManageServiceException {
+    public boolean updatePacketRef(PacketInDO packetDO) throws PacketManageServiceException {
         try {
             if (packetDO !=null && packetRefCheck(packetDO)){
                 addPacketRef(packetDO);
@@ -154,9 +154,9 @@ public class PacketRefManageServiceImpl implements PacketRefMangeService {
      * @param packetDO
      * @return
      */
-    private boolean packetRefCheck(PacketDO packetDO){
+    private boolean packetRefCheck(PacketInDO packetDO){
         String desc = packetDO.getDesc();
-        String oldDesc = packetMapper.selectByPacketID(packetDO.getId()).getDesc();
+        String oldDesc = packetInMapper.selectByPacketID(packetDO.getId()).getDesc();
         if (desc.equalsIgnoreCase(oldDesc))
             return false;
         return true;

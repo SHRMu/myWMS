@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="de.demarks.wms.dao.PacketInMapper">
+
+	<resultMap type="de.demarks.wms.domain.PacketInDO" id="PacketInDO">
+		<id property="id" column="PACKET_IN_ID"/>
+		<result property="trace" column="PACKET_IN_TRACE"/>
+		<result property="time" column="PACKET_IN_TIME"/>
+		<result property="status" column="PACKET_IN_STATUS"/>
+		<result property="desc" column="PACKET_IN_DESC"/>
+		<result property="customerID" column="PACKET_IN_CUSTOMERID"/>
+		<result property="repositoryID" column="PACKET_IN_REPOID"/>
+	</resultMap>
+
+	<select id="selectAll" resultMap="PacketInDO">
+		select
+			p.PACKET_IN_ID,
+			p.PACKET_IN_TRACE,
+			p.PACKET_IN_TIME,
+			p.PACKET_IN_STATUS,
+			p.PACKET_IN_DESC,
+			P.PACKET_IN_CUSTOMERID,
+			p.PACKET_IN_REPOID
+		from
+			wms_packet_in p, wms_customer c, wms_repository r
+		where
+			p.PACKET_IN_CUSTOMERID = c.CUSTOMER_ID and
+			p.PACKET_IN_REPOID = r.REPO_ID
+		<if test="customerID != null">
+			and p.PACKET_IN_CUSTOMERID = #{customerID}
+		</if>
+		<if test="repositoryID !=null">
+			and p.PACKET_IN_REPOID = #{repositoryID}
+		</if>
+	</select>
+	
+	<select id="selectByPacketID" resultMap="PacketInDO">
+		select
+			p.PACKET_IN_ID,
+			p.PACKET_IN_TRACE,
+			p.PACKET_IN_TIME,
+			p.PACKET_IN_STATUS,
+			p.PACKET_IN_DESC,
+			P.PACKET_IN_CUSTOMERID,
+			p.PACKET_IN_REPOID
+		from
+			wms_packet_in p, wms_customer c, wms_repository r
+		where
+			p.PACKET_IN_CUSTOMERID = c.CUSTOMER_ID and
+			p.PACKET_IN_REPOID = r.REPO_ID and
+			p.PACKET_IN_ID = #{packetID}
+	</select>
+
+	<select id="selectByTraceApproximate" resultMap="PacketInDO">
+		select
+			p.PACKET_IN_ID,
+			p.PACKET_IN_TRACE,
+			p.PACKET_IN_TIME,
+			p.PACKET_IN_STATUS,
+			p.PACKET_IN_DESC,
+			P.PACKET_IN_CUSTOMERID,
+			p.PACKET_IN_REPOID
+		from
+			wms_packet_in p, wms_customer c, wms_repository r
+		where
+			p.PACKET_IN_CUSTOMERID = c.CUSTOMER_ID and
+			p.PACKET_IN_REPOID = r.REPO_ID and
+			p.PACKET_IN_TRACE like concat ('%',#{trace},'%')
+		<if test="status !=null">
+			and p.PACKET_IN_STATUS = #{status}
+		</if>
+		<if test="customerID != null">
+			and p.PACKET_IN_CUSTOMERID = #{customerID}
+		</if>
+		<if test="repositoryID !=null">
+			and p.PACKET_IN_REPOID = #{repositoryID}
+		</if>
+	</select>
+	
+	<select id="selectByDate" resultMap="PacketInDO">
+		select
+			p.PACKET_IN_ID,
+			p.PACKET_IN_TRACE,
+			p.PACKET_IN_TIME,
+			p.PACKET_IN_STATUS,
+			p.PACKET_IN_DESC,
+			P.PACKET_IN_CUSTOMERID,
+			p.PACKET_IN_REPOID
+		from
+			wms_packet_in p, wms_customer c, wms_repository r
+		where
+			p.PACKET_IN_CUSTOMERID = c.CUSTOMER_ID and
+			p.PACKET_IN_REPOID = r.REPO_ID
+		<if test="customerID != null">
+			and p.PACKET_IN_CUSTOMERID = #{customerID}
+		</if>
+		<if test="repositoryID != null ">
+			and p.PACKET_IN_REPOID = #{repositoryID}
+		</if>
+		<if test="startDate != null">
+			and p.PACKET_IN_TIME >= #{startDate}
+		</if>
+		<if test="endDate != null">
+			<![CDATA[and p.PACKET_IN_TIME <= #{endDate}]]>
+		</if>
+	</select>
+
+	<insert id="insert">
+		insert into wms_packet_in(PACKET_IN_TRACE,PACKET_IN_TIME,PACKET_IN_STATUS,PACKET_IN_DESC,PACKET_IN_CUSTOMERID,PACKET_IN_REPOID)
+		values (#{trace},#{time},#{status},#{desc},#{customerID},#{repositoryID})
+	</insert>
+	
+	<insert id="insertBatch">
+		insert into wms_packet_in(PACKET_IN_TRACE,PACKET_IN_TIME,PACKET_IN_STATUS,PACKET_IN_DESC,PACKET_IN_CUSTOMERID,PACKET_IN_REPOID)
+		values
+		<foreach collection="list" item="packetInDO" separator=",">
+			(#{packetInDO.trace},#{packetInDO.time},#{packetInDO.status},#{packetInDO.desc},#{packetInDO.customerID},#{packetInDO.repositoryID})
+		</foreach>
+	</insert>
+
+	<update id="update">
+		update
+			wms_packet_in
+		set
+			PACKET_IN_TRACE = #{trace},
+			PACKET_IN_STATUS = #{status},
+			PACKET_IN_DESC = #{desc},
+			PACKET_IN_CUSTOMERID = #{customerID},
+			PACKET_IN_REPOID = #{repositoryID}
+		where
+			PACKET_IN_ID = #{id}
+	</update>
+
+	<delete id="deleteByPacketID">
+		delete from wms_packet_in
+		where PACKET_IN_ID = #{packetID}
+	</delete>
+
+</mapper>

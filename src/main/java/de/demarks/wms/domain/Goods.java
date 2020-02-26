@@ -3,7 +3,7 @@ package de.demarks.wms.domain;
 /**
  * 货物信息
  *
- * @author Shouran
+ * @author huanyingcool
  *
  */
 public class Goods {

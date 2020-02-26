@@ -1,15 +1,16 @@
 package de.demarks.wms.common.controller;
 
-import com.sun.xml.internal.ws.api.message.Packet;
 import de.demarks.wms.common.service.Interface.PacketManageService;
 import de.demarks.wms.common.service.Interface.PacketRefMangeService;
 import de.demarks.wms.common.service.Interface.PacketStorageManageService;
 import de.demarks.wms.common.util.Response;
 import de.demarks.wms.common.util.ResponseUtil;
 import de.demarks.wms.common.util.StatusUtil;
-import de.demarks.wms.dao.PacketMapper;
-import de.demarks.wms.domain.PacketDO;
+import de.demarks.wms.dao.PacketInMapper;
+import de.demarks.wms.dao.PacketOutMapper;
 import de.demarks.wms.domain.PacketDTO;
+import de.demarks.wms.domain.PacketInDO;
+import de.demarks.wms.domain.PacketOutDO;
 import de.demarks.wms.exception.PacketManageServiceException;
 import de.demarks.wms.exception.PacketStorageManageServiceException;
 import de.demarks.wms.exception.PreStockManageServiceException;
@@ -33,31 +34,27 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 包裹操作请求 Handler
+ * 出库包裹操作请求 Handler
  *
  * @author huanyingcool
  */
-@RequestMapping(value = "packetManage")
+@RequestMapping(value = "packetOutManage")
 @Controller
-public class PacketMangeHandler {
+public class PacketOutMangeHandler {
 
     @Autowired
     private ResponseUtil responseUtil;
     @Autowired
-    private PacketMapper packetMapper;
+    private PacketOutMapper packetOutMapper;
     @Autowired
     private PacketManageService packetManageService;
     @Autowired
     private PacketStorageManageService packetStorageManageService;
-    @Autowired
-    private PacketRefMangeService packetRefMangeService;
 
     private static final String SEARCH_BY_PACKET_ID = "searchByPacketID";
     private static final String SEARCH_BY_TRACE = "searchByTrace";
     private static final String SEARCH_ACTIVE = "searchActive";
     private static final String SEARCH_ALL= "searchAll";
-
-    private static final String SEARCH_REF_ACTIVE = "searchRefActive";
 
     /**
      * 通用的记录查询
@@ -68,7 +65,8 @@ public class PacketMangeHandler {
      * @return
      * @throws PacketManageServiceException
      */
-    private Map<String, Object> query(@Param("searchType") String searchType, @Param("keyWord") String keyWord, @Param("repositoryID") Integer repositoryID,
+    private Map<String, Object> query(@Param("searchType") String searchType, @Param("keyWord") String keyWord,
+                                      @Param("customerID") Integer customerID, @Param("repositoryID") Integer repositoryID,
                                       @Param("offset") int offset, @Param("limit") int limit) throws PacketManageServiceException {
 
         Map<String, Object> queryResult = null;
@@ -79,16 +77,13 @@ public class PacketMangeHandler {
                     queryResult = packetManageService.selectByPacketID(Integer.valueOf(keyWord));
                 break;
             case SEARCH_BY_TRACE:
-                queryResult = packetManageService.selectByTraceApproximate(keyWord, "", repositoryID, offset, limit);
+                queryResult = packetManageService.selectByTraceApproximate(keyWord, "", customerID, repositoryID, offset, limit);
                 break;
             case SEARCH_ACTIVE:
-                queryResult = packetManageService.selectByTraceApproximate("",StatusUtil.PACKET_STATUS_SEND,repositoryID);
+                queryResult = packetManageService.selectByTraceApproximate("",StatusUtil.PACKET_STATUS_SEND, customerID, repositoryID);
                 break;
             case SEARCH_ALL:
-                queryResult = packetManageService.selectAll(repositoryID, offset, limit);
-                break;
-            case SEARCH_REF_ACTIVE:
-                queryResult = packetRefMangeService.selectRefApproximate(keyWord,StatusUtil.PACKET_STATUS_SEND,repositoryID);
+                queryResult = packetManageService.selectAll(customerID, repositoryID, offset, limit);
                 break;
             default:
                 // do other thing
@@ -101,6 +96,7 @@ public class PacketMangeHandler {
      * 获取指定包裹列表
      * @param searchType
      * @param keyWord
+     * @param customerID
      * @param repositoryID
      * @param offset
      * @param limit
@@ -111,18 +107,19 @@ public class PacketMangeHandler {
     @RequestMapping(value = "getPacketList", method = RequestMethod.GET)
     public
     @ResponseBody
-    Map<String, Object> getPacketList(@RequestParam("searchType") String searchType, @RequestParam("keyWord") String keyWord, @Param("repositoryID") Integer repositoryID,
+    Map<String, Object> getPacketList(@RequestParam("searchType") String searchType, @RequestParam("keyWord") String keyWord,
+                                      @Param("customerID") Integer customerID, @Param("repositoryID") Integer repositoryID,
                                       @RequestParam("offset") int offset, @RequestParam("limit") int limit) throws PacketManageServiceException {
         // 初始化 Response
         Response responseContent = responseUtil.newResponseInstance();
-        List<PacketDO> rows = null;
+        List<PacketInDO> rows = null;
         long total = 0;
 
         // 查询
-        Map<String, Object> queryResult = query(searchType, keyWord, repositoryID, offset, limit);
+        Map<String, Object> queryResult = query(searchType, keyWord, customerID, repositoryID, offset, limit);
 
         if (queryResult != null) {
-            rows = (List<PacketDO>) queryResult.get("data");
+            rows = (List<PacketInDO>) queryResult.get("data");
             total = (long) queryResult.get("total");
         }
 
@@ -136,6 +133,7 @@ public class PacketMangeHandler {
      * 获取未签收包裹列表
      * @param searchType
      * @param keyWord
+     * @param customerID
      * @param repositoryID
      * @param offset
      * @param limit
@@ -146,18 +144,19 @@ public class PacketMangeHandler {
     @RequestMapping(value = "getActivePacketList", method = RequestMethod.GET)
     public
     @ResponseBody
-    Map<String, Object> getActivePacketList(@RequestParam("searchType") String searchType, @RequestParam("keyWord") String keyWord, @Param("repositoryID") Integer repositoryID,
+    Map<String, Object> getActivePacketList(@RequestParam("searchType") String searchType, @RequestParam("keyWord") String keyWord,
+                                            @Param("customerID") Integer customerID, @Param("repositoryID") Integer repositoryID,
                                             @RequestParam("offset") int offset, @RequestParam("limit") int limit) throws PacketManageServiceException {
         // 初始化 Response
         Response responseContent = responseUtil.newResponseInstance();
-        List<PacketDO> rows = null;
+        List<PacketInDO> rows = null;
         long total = 0;
 
         // 查询
-        Map<String, Object> queryResult = query(searchType, keyWord, repositoryID, offset, limit);
+        Map<String, Object> queryResult = query(searchType, keyWord, customerID, repositoryID, offset, limit);
 
         if (queryResult != null) {
-            rows = (List<PacketDO>) queryResult.get("data");
+            rows = (List<PacketInDO>) queryResult.get("data");
             total = (long) queryResult.get("total");
         }
 
@@ -207,7 +206,7 @@ public class PacketMangeHandler {
     @RequestMapping(value = "addPacket", method = RequestMethod.POST)
     public
     @ResponseBody
-    Map<String, Object> addPacket(@RequestBody PacketDO packetDO) throws PacketManageServiceException {
+    Map<String, Object> addPacket(@RequestBody PacketInDO packetDO) throws PacketManageServiceException {
         // 初始化 Response
         Response responseContent = responseUtil.newResponseInstance();
 
@@ -229,7 +228,7 @@ public class PacketMangeHandler {
     @RequestMapping(value = "updatePacket", method = RequestMethod.POST)
     public
     @ResponseBody
-    Map<String, Object> updatePacket(@RequestBody PacketDO packetDO) throws PacketManageServiceException {
+    Map<String, Object> updatePacket(@RequestBody PacketInDO packetDO) throws PacketManageServiceException {
         // 初始化 Response
         Response responseContent = responseUtil.newResponseInstance();
 
@@ -303,11 +302,11 @@ public class PacketMangeHandler {
 
         String fileName = "packetInfo.xlsx";
 
-        List<PacketDO> packetDOS = null;
-        Map<String, Object> queryResult = query(searchType, keyWord, -1, -1, -1);
+        List<PacketInDO> packetDOS = null;
+        Map<String, Object> queryResult = query(searchType, keyWord, -1, -1, -1, -1);
 
         if (queryResult != null) {
-            packetDOS = (List<PacketDO>) queryResult.get("data");
+            packetDOS = (List<PacketInDO>) queryResult.get("data");
         }
 
         // 获取生成的文件
@@ -355,7 +354,7 @@ public class PacketMangeHandler {
         HttpSession session = request.getSession();
 //        String personInCharge = (String) session.getAttribute("userName"); //默认获取的userName取锁定客户ID
 
-        PacketDO packetDO = packetMapper.selectByTrace(trace,repositoryID); //验证是否有过该包裹预报
+        PacketOutDO packetDO = packetOutMapper.selectByTraceApproximate(trace,null , null, repositoryID).get(0); //验证是否有过该包裹预报
         Integer packetID;
         String result = Response.RESPONSE_RESULT_ERROR;
         if (packetDO != null){

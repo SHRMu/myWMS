@@ -4,8 +4,8 @@ import de.demarks.wms.common.service.Interface.PacketStorageManageService;
 import de.demarks.wms.common.util.Response;
 import de.demarks.wms.common.util.ResponseUtil;
 import de.demarks.wms.common.util.StatusUtil;
-import de.demarks.wms.dao.PacketMapper;
-import de.demarks.wms.domain.PacketDO;
+import de.demarks.wms.dao.PacketInMapper;
+import de.demarks.wms.domain.PacketInDO;
 import de.demarks.wms.domain.PacketStorage;
 import de.demarks.wms.exception.PacketStorageManageServiceException;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +37,7 @@ public class PacketStorageManageHandler {
     @Autowired
     private ResponseUtil responseUtil;
     @Autowired
-    private  PacketMapper packetMapper;
+    private PacketInMapper packetInMapper;
     @Autowired
     private PacketManageService packetManageService;
     @Autowired
@@ -184,10 +184,10 @@ public class PacketStorageManageHandler {
         if (StringUtils.isBlank(status))
             isAvailable = false;
 
-        PacketDO packetDO = packetMapper.selectByPacketID(Integer.valueOf(packetID));
+        PacketInDO packetDO = packetInMapper.selectByPacketID(Integer.valueOf(packetID));
         if (packetDO != null && !packetDO.getStatus().equals(status)){
             packetDO.setStatus(status);
-            packetMapper.update(packetDO);
+            packetInMapper.update(packetDO);
         }
 
         if (isAvailable) {

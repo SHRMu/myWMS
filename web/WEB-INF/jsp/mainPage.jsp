@@ -6,7 +6,7 @@ pageEncoding="UTF-8"%>
 <head>
     <!--//{pageContext.request.contextPath}作用是取出部署应用程序的名字-->
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>仓库管理系统</title>
+    <title>demarks仓库管理系统</title>
     <link rel="stylesheet" type="text/css"
           href="${pageContext.request.contextPath}/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css"
@@ -139,7 +139,7 @@ pageEncoding="UTF-8"%>
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a href="#collapse2" data-toggle="collapse" data-parent="#accordion"
+                            <a href="#collapse3" data-toggle="collapse" data-parent="#accordion"
                                class="parentMenuTitle collapseHead">库存操作</a>
                             <div class="pull-right">
                                 <span class="caret"></span>
@@ -217,7 +217,11 @@ pageEncoding="UTF-8"%>
                             <ul class="list-group">
                                 <li class="list-group-item">
                                     <a href="javascript:void(0)" id="" class="menu_item"
-                                       name="pagecomponent/packetManagement.jsp">包裹信息管理</a>
+                                       name="pagecomponent/packetInManagement.jsp">入库包裹信息</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <a href="javascript:void(0)" id="" class="menu_item"
+                                       name="pagecomponent/packetOutManagement.jsp">出库包裹信息</a>
                                 </li>
                                 <shiro:hasRole name="systemAdmin">
                                 <li class="list-group-item">

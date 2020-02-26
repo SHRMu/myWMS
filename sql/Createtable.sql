@@ -52,7 +52,6 @@ create table wms_action
     primary key(ACTION_ID)
 )engine=innodb;
 
-
 # 角色 - URL权限关联表
 create table wms_role_action
 (
@@ -128,44 +127,62 @@ INSERT INTO `wms_customer` VALUES (2001,'Anker','陈娟','17716786888','23369888
 # 导入仓库信息
 INSERT INTO `wms_repository` VALUES (3001,'德国','可用','11000㎡','提供服务完整');
 
-# 客户发送包裹信息
+# 接收包裹信息
  create table wms_packet_in
  (
-	PACKET_ID int not null auto_increment,
-    PACKET_TRACE varchar(30) not null,
-    PACKET_TIME datetime not null,
-    PACKET_STATUS varchar(15) not null,
-    PACKET_DESC varchar(50),
-    PACKET_CUSTOMERID int not null,
-    PACKET_REPOID int not null,
-    primary key(PACKET_ID),
-    foreign key(PACKET_CUSTOMERID) references wms_customer(CUSTOMER_ID),
-    foreign key(PACKET_REPOID) references wms_repository(REPO_ID)
+	PACKET_IN_ID int not null auto_increment,
+    PACKET_IN_TRACE varchar(30) not null,
+    PACKET_IN_TIME datetime not null,
+    PACKET_IN_STATUS varchar(15) not null,
+    PACKET_IN_DESC varchar(50),
+    PACKET_IN_CUSTOMERID int not null,
+    PACKET_IN_REPOID int not null,
+    primary key(PACKET_IN_ID),
+    foreign key(PACKET_IN_CUSTOMERID) references wms_customer(CUSTOMER_ID),
+    foreign key(PACKET_IN_REPOID) references wms_repository(REPO_ID)
  )engine=innodb;
 
-INSERT INTO `wms_packet_in` VALUES (1,'003400121','2019-09-17 08:59:55','发货中','003400122,003400123',2001, 3001),(2,'00340456','2019-08-22 08:59:55','发货中','', 2001, 3001);
+INSERT INTO `wms_packet_in` VALUES (1,'003400121','2020-02-17 08:59:55','发货中','003400122,003400123',2001,3001),(2,'00340456','2020-02-22 08:59:55','发货中','', 2001, 3001);
 
- create table wms_packet_ref
+# 子运单信息
+ create table wms_packet_sub
 (
-    PACKET_ID int not null auto_increment,
-    PACKET_TRACE varchar(30) not null,
-    PACKET_REF_ID int not null,
-    primary key(PACKET_ID),
-    foreign key(PACKET_REF_ID) references wms_packet_in(PACKET_ID)
+    PACKET_SUB_ID int not null auto_increment,
+    PACKET_SUB_TRACE varchar(30) not null,
+    PACKET_IN_ID int not null,
+    primary key(PACKET_SUB_ID),
+    foreign key(PACKET_IN_ID) references wms_packet_in(PACKET_IN_ID)
 )engine=innodb;
 
-INSERT INTO `wms_packet_ref` VALUES (1,'DHL000',1),(2,'DHL111',1),(3,'DHL222',1),(4,'00340456',2);
+INSERT INTO `wms_packet_sub` VALUES (1,'DHL000',1),(2,'DHL111',1),(3,'DHL222',1),(4,'00340456',2);
 
+create table wms_packet_out
+(
+    PACKET_OUT_ID int not null auto_increment,
+    PACKET_OUT_TRACE varchar(30),
+    PACKET_OUT_TIME datetime not null,
+    PACKET_OUT_STATUS varchar(15) not null,
+    PACKET_OUT_DESC varchar(50),
+    PACKET_OUT_CUSTOMERID int not null,
+    PACKET_OUT_REPOID int not null,
+    primary key(PACKET_OUT_ID),
+    foreign key(PACKET_OUT_CUSTOMERID) references wms_customer(CUSTOMER_ID),
+    foreign key(PACKET_OUT_REPOID) references wms_repository(REPO_ID)
+ )engine=innodb;
+
+# 包裹预报信息
 create table wms_packet_storage
 (
-    PRE_PACKETID int not null,
+    PRE_PACKET_IN_ID int not null,
     PRE_GOODID int not null,
+    PRE_CUSTOMERID int not null,
     PRE_REPOSITORYID int not null,
     PRE_NUMBER int not null,
     PRE_STORAGE int not null,
-    primary key(PRE_PACKETID,PRE_GOODID),
-    foreign key(PRE_PACKETID) references wms_packet_in(PACKET_ID),
-    foreign key(PRE_GOODID) references  wms_goods(GOOD_ID),
+    primary key(PRE_PACKET_IN_ID,PRE_GOODID),
+    foreign key(PRE_PACKET_IN_ID) references wms_packet_in(PACKET_IN_ID),
+    foreign key(PRE_GOODID) references wms_goods(GOOD_ID),
+    foreign key(PRE_CUSTOMERID) REFERENCES wms_customer(CUSTOMER_ID),
     foreign key(PRE_REPOSITORYID) references wms_repository(REPO_ID)
 )engine=innodb;
 

@@ -22,7 +22,7 @@ public class PageForwardHandler {
      */
     @RequestMapping("login")
     public String loginPageForward() {
-        // 判断但钱用户是否已经登陆
+        // 判断当前用户是否已经登陆
         Subject currentSubject = SecurityUtils.getSubject();
         if (!currentSubject.isAuthenticated())
             return "login";

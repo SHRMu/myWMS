@@ -32,7 +32,7 @@ public class PacketManageServiceImpl implements PacketManageService {
     @Autowired
     private ExcelUtil excelUtil;
     @Autowired
-    private PacketMapper packetMapper;
+    private PacketInMapper packetInMapper;
     @Autowired
     private GoodsMapper goodsMapper;
     @Autowired
@@ -41,19 +41,22 @@ public class PacketManageServiceImpl implements PacketManageService {
     private PacketStorageMapper packetStorageMapper;
     @Autowired
     private PacketRefMangeService packetRefMangeService;
+
     /**
      * 选择全部信息
+     * @param customerID
      * @param repositoryID
      * @return
      * @throws PacketManageServiceException
      */
     @Override
-    public Map<String, Object> selectAll(Integer repositoryID) throws PacketManageServiceException {
-        return selectAll(repositoryID, -1, -1);
+    public Map<String, Object> selectAll(Integer customerID, Integer repositoryID) throws PacketManageServiceException {
+        return selectAll(customerID, repositoryID, -1, -1);
     }
 
     /**
      * 分页 选择全部信息
+     * @param customerID
      * @param repositoryID
      * @param offset 分页的偏移值
      * @param limit  分页的大小
@@ -61,10 +64,10 @@ public class PacketManageServiceImpl implements PacketManageService {
      * @throws PacketManageServiceException
      */
     @Override
-    public Map<String, Object> selectAll(Integer repositoryID, int offset, int limit) throws PacketManageServiceException {
+    public Map<String, Object> selectAll(Integer customerID, Integer repositoryID, int offset, int limit) throws PacketManageServiceException {
         // 初始化结果集
         Map<String, Object> resultSet = new HashMap<>();
-        List<PacketDO> packetDOList;
+        List<PacketInDO> packetDOList;
 
         long total = 0;
         boolean isPagination = true;
@@ -79,14 +82,14 @@ public class PacketManageServiceImpl implements PacketManageService {
         try {
             if (isPagination) {
                 PageHelper.offsetPage(offset, limit);
-                packetDOList = packetMapper.selectAll(repositoryID);
+                packetDOList = packetInMapper.selectAll(null, repositoryID);
                 if (packetDOList != null) {
-                    PageInfo<PacketDO> pageInfo = new PageInfo<>(packetDOList);
+                    PageInfo<PacketInDO> pageInfo = new PageInfo<>(packetDOList);
                     total = pageInfo.getTotal();
                 } else
                     packetDOList = new ArrayList<>();
             } else {
-                packetDOList = packetMapper.selectAll(repositoryID);
+                packetDOList = packetInMapper.selectAll(null, repositoryID);
                 if (packetDOList != null)
                     total = packetDOList.size();
                 else
@@ -120,9 +123,9 @@ public class PacketManageServiceImpl implements PacketManageService {
         long total = 0;
 
         // 查询
-        PacketDO packetDO;
+        PacketInDO packetDO;
         try {
-            packetDO = packetMapper.selectByPacketID(packetID);
+            packetDO = packetInMapper.selectByPacketID(packetID);
         } catch (PersistenceException e) {
             throw new PacketManageServiceException(e);
         }
@@ -142,19 +145,21 @@ public class PacketManageServiceImpl implements PacketManageService {
      * 模糊查询 返回指定运单号的信息
      * @param trace
      * @param status
+     * @param customerID
      * @param repositoryID
      * @return
      * @throws PacketManageServiceException
      */
     @Override
-    public Map<String, Object> selectByTraceApproximate(String trace, String status, Integer repositoryID) throws PacketManageServiceException {
-        return  selectByTraceApproximate(trace, status, repositoryID, -1, -1);
+    public Map<String, Object> selectByTraceApproximate(String trace, String status, Integer customerID, Integer repositoryID) throws PacketManageServiceException {
+        return  selectByTraceApproximate(trace, status, customerID, repositoryID, -1, -1);
     }
 
     /**
      * 模糊查询 分页 返回指定运单号的信息
      * @param trace
      * @param status
+     * @param customerID
      * @param repositoryID
      * @param offset
      * @param limit
@@ -162,10 +167,10 @@ public class PacketManageServiceImpl implements PacketManageService {
      * @throws PacketManageServiceException
      */
     @Override
-    public Map<String, Object> selectByTraceApproximate(String trace, String status, Integer repositoryID, int offset, int limit) throws PacketManageServiceException {
+    public Map<String, Object> selectByTraceApproximate(String trace, String status, Integer customerID, Integer repositoryID, int offset, int limit) throws PacketManageServiceException {
         // 初始化结果集
         Map<String, Object> resultSet = new HashMap<>();
-        List<PacketDO> packetDOList;
+        List<PacketInDO> packetDOList;
 
         long total = 0;
         boolean isPagination = true;
@@ -182,14 +187,14 @@ public class PacketManageServiceImpl implements PacketManageService {
         try {
             if (isPagination) {
                 PageHelper.offsetPage(offset, limit);
-                packetDOList = packetMapper.selectByTraceApproximate(trace, status, repositoryID);
+                packetDOList = packetInMapper.selectByTraceApproximate(trace, status, customerID, repositoryID);
                 if (packetDOList != null) {
-                    PageInfo<PacketDO> pageInfo = new PageInfo<>(packetDOList);
+                    PageInfo<PacketInDO> pageInfo = new PageInfo<>(packetDOList);
                     total = pageInfo.getTotal();
                 } else
                     packetDOList = new ArrayList<>();
             } else {
-                packetDOList = packetMapper.selectByTraceApproximate(trace, status, repositoryID);
+                packetDOList = packetInMapper.selectByTraceApproximate(trace, status, customerID, repositoryID);
                 if (packetDOList != null)
                     total = packetDOList.size();
                 else
@@ -214,21 +219,21 @@ public class PacketManageServiceImpl implements PacketManageService {
      * @throws PacketManageServiceException
      */
     @Override
-    public boolean addPacket(PacketDO packetDO) throws PacketManageServiceException {
+    public boolean addPacket(PacketInDO packetDO) throws PacketManageServiceException {
         try {
             // 插入新的记录
             if (packetDO != null) {
                 // 验证
                 if (packetCheck(packetDO)) {
                     // 通过单号验证包裹信息是否存在
-                    PacketDO p = packetMapper.selectByTrace(packetDO.getTrace(), packetDO.getRepositoryID());
+                    List<PacketInDO> p = packetInMapper.selectByTraceApproximate(packetDO.getTrace(), null, packetDO.getCustomerID(), packetDO.getRepositoryID());
                     if (p != null){ //如果已经存在该单号
                         updatePacket(packetDO);
                         return true;
                     }
                     packetDO.setTime(new Date());
-                    packetMapper.insert(packetDO);
-                    PacketDO packetDOID = packetMapper.selectByTrace(packetDO.getTrace(), packetDO.getRepositoryID());
+                    packetInMapper.insert(packetDO);
+                    PacketInDO packetDOID = packetInMapper.selectByTraceApproximate(packetDO.getTrace(), null, packetDO.getCustomerID(), packetDO.getRepositoryID()).get(0);
                     //添加附加包裹信息
                     packetRefMangeService.addPacketRef(packetDOID);
                     return true;
@@ -246,13 +251,13 @@ public class PacketManageServiceImpl implements PacketManageService {
      * @return
      */
     @Override
-    public boolean updatePacket(PacketDO packetDO) throws PacketManageServiceException {
+    public boolean updatePacket(PacketInDO packetDO) throws PacketManageServiceException {
         try {
             // 更新记录
             if (packetDO != null && packetCheck(packetDO)) {
                 packetRefMangeService.updatePacketRef(packetDO); //先更新依赖包裹
 //                packetDO.setTime(new Date());
-                packetMapper.update(packetDO);
+                packetInMapper.update(packetDO);
                 return true;
             }
             return false;
@@ -274,12 +279,12 @@ public class PacketManageServiceImpl implements PacketManageService {
             if (!packetStorageList.isEmpty())
                 return false;
             //检查该包裹是否已签收
-            PacketDO packetDO = packetMapper.selectByPacketID(packetID);
+            PacketInDO packetDO = packetInMapper.selectByPacketID(packetID);
             String status = packetDO.getStatus();
             if(status.equals(StatusUtil.PACKET_STATUS_RECEIVE)){
                 //先删除相关依赖的PacketRef
                 packetRefMangeService.deletePacketRef(packetID);
-                packetMapper.deleteByPacketID(packetID);
+                packetInMapper.deleteByPacketID(packetID);
                 return true;
             }
             return false;
@@ -308,8 +313,8 @@ public class PacketManageServiceImpl implements PacketManageService {
             total = packetUpList.size();
             // 验证每一条记录
             PacketUp packetUp;
-            PacketDO packetDO;
-            List<PacketDO> availableList = new ArrayList<>();
+            PacketInDO packetDO;
+            List<PacketInDO> availableList = new ArrayList<>();
             for (Object object : packetUpList) {
                 packetUp = (PacketUp) object;
                 packetDO = packetConvertToPacketDO(packetUp);
@@ -321,7 +326,7 @@ public class PacketManageServiceImpl implements PacketManageService {
             try {
                 available = availableList.size();
                 if (available > 0) {
-                    packetMapper.insertBatch(availableList);
+                    packetInMapper.insertBatch(availableList);
                 }
             } catch (PersistenceException e) {
                 throw new PacketManageServiceException(e);
@@ -341,11 +346,11 @@ public class PacketManageServiceImpl implements PacketManageService {
      */
     @UserOperation(value = "导出包裹信息")
     @Override
-    public File exportPacket(List<PacketDO> packetDOS) {
+    public File exportPacket(List<PacketInDO> packetDOS) {
         if (packetDOS == null)
             return null;
 
-        return excelUtil.excelWriter(PacketDO.class, packetDOS);
+        return excelUtil.excelWriter(PacketInDO.class, packetDOS);
     }
 
 
@@ -355,7 +360,7 @@ public class PacketManageServiceImpl implements PacketManageService {
      * @param packetDO 货物信息
      * @return 若货物信息满足要求则返回true，否则返回false
      */
-    private boolean packetCheck(PacketDO packetDO) {
+    private boolean packetCheck(PacketInDO packetDO) {
         if (packetDO != null) {
             if ( (packetDO.getTrace()!=null) && (packetDO.getStatus()!=null) && (packetDO.getRepositoryID()!=null)) {
                 return true;
@@ -366,8 +371,8 @@ public class PacketManageServiceImpl implements PacketManageService {
 
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-hh-mm");
 
-    private PacketDO packetConvertToPacketDO(PacketUp packetUp){
-        PacketDO packetDO = new PacketDO();
+    private PacketInDO packetConvertToPacketDO(PacketUp packetUp){
+        PacketInDO packetDO = new PacketInDO();
         packetDO.setTrace(packetUp.getTrace());
         packetDO.setStatus(StatusUtil.PACKET_STATUS_SEND);
         packetDO.setTime(new Date());
@@ -381,7 +386,7 @@ public class PacketManageServiceImpl implements PacketManageService {
      * @param packetDO
      * @return
      */
-    private PacketDTO packetConvertToPacketDTO(PacketDO packetDO){
+    private PacketDTO packetConvertToPacketDTO(PacketInDO packetDO){
         PacketDTO packetDTO = new PacketDTO();
         packetDTO.setId(packetDO.getId());
         packetDTO.setTrace(packetDO.getTrace());
@@ -450,7 +455,7 @@ public class PacketManageServiceImpl implements PacketManageService {
      */
     private boolean packetValidate(Integer packetID) throws PacketManageServiceException {
         try {
-            PacketDO packetDO = packetMapper.selectByPacketID(packetID);
+            PacketInDO packetDO = packetInMapper.selectByPacketID(packetID);
             return packetDO != null;
         } catch (PersistenceException e) {
             throw new PacketManageServiceException(e);

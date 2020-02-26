@@ -53,10 +53,10 @@ public class AccountSessionListener implements HttpSessionListener, ApplicationC
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-//        if (applicationContext instanceof WebApplicationContext){
-//            ((WebApplicationContext)applicationContext).getServletContext().addListener(this);
-//        }else{
-//            throw new RuntimeException();
-//        }
+        if (applicationContext instanceof WebApplicationContext){
+            ((WebApplicationContext)applicationContext).getServletContext().addListener(this);
+        }else{
+            throw new RuntimeException();
+        }
     }
 }

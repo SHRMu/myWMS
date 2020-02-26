@@ -26,7 +26,7 @@ public class StockRecordManageServiceImpl implements StockRecordManageService {
     @Autowired
     private CustomerMapper customerMapper;
     @Autowired
-    private PacketMapper packetMapper;
+    private PacketInMapper packetInMapper;
     @Autowired
     private GoodsMapper goodsMapper;
     @Autowired
@@ -421,7 +421,7 @@ public class StockRecordManageServiceImpl implements StockRecordManageService {
      */
     private boolean packetValidate(Integer packetID) throws StockRecordManageServiceException {
         try {
-            PacketDO packetDO = packetMapper.selectByPacketID(packetID);
+            PacketInDO packetDO = packetInMapper.selectByPacketID(packetID);
             return packetDO != null;
         } catch (PersistenceException e) {
             throw new StockRecordManageServiceException(e);

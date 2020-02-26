@@ -7,6 +7,7 @@
 	var selectID;
 
 	$(function() {
+		customerSelectorInit();
 		repositorySelectorInit();
 		optionAction();
 		searchAction();
@@ -20,7 +21,31 @@
 		exportpacketAction()
 	})
 
-	// 仓库下拉列表初始化
+	// 发货客户下拉列表初始化
+	function customerSelectorInit(){
+		$.ajax({
+			type : 'GET',
+			url : 'customerManage/getCustomerList',
+			dataType : 'json',
+			contentType : 'application/json',
+			data : {
+				searchType : 'searchAll',
+				keyWord : '',
+				offset : -1,
+				limit : -1
+			},
+			success : function(response){
+				$.each(response.rows,function(index,elem){
+					$('#customer_selector, #customer_selector_edit').append("<option value='" + elem.id + "'>" + elem.id +"号客户</option>");
+				});
+			},
+			error : function(response){
+				$('#customer_selector, #customer_selector_edit').append("<option value='-1'>加载失败</option>");
+			}
+		})
+	}
+
+	// 收货仓库下拉列表初始化
 	function repositorySelectorInit(){
 		$.ajax({
 			type : 'GET',
@@ -77,6 +102,8 @@
 		})
 	}
 
+	// todo : 添加客户信息和仓库信息过滤选项
+
 	// 分页查询参数
 	function queryParams(params) {
 		var temp = {
@@ -113,9 +140,14 @@
 										title : '发货日期'
 									},
 									{
+										field : 'customerID',
+										title : '客户ID',
+										// visible : false
+									},
+									{
 										field : 'repositoryID',
 										title : '仓库ID',
-										visible : false
+										// visible : false
 									},
 									{
 										field : 'status',
@@ -146,7 +178,7 @@
 											}
 										}
 									} ],
-							url : 'packetManage/getPacketList',
+							url : 'packetInManage/getPacketList',
 							method : 'GET',
 							queryParams : queryParams,
 							sidePagination : "server",
@@ -169,7 +201,6 @@
 	// 行编辑操作
 	function rowEditOperation(row) {
 		$('#edit_modal').modal("show");
-
 		// load info
 		$('#packet_form_edit').bootstrapValidator("resetForm", true);
 		$('#packet_trace_edit').val(row.trace);
@@ -215,13 +246,14 @@
 						trace : $('#packet_trace_edit').val(),
 						status : $('#packet_status_edit').val(),
 						desc :  $('#packet_desc_edit').val(),
+						customerID : $('#customer_selector_edit').val(),
 						repositoryID : $('#repository_selector_edit').val()
 					}
 
 					// ajax
 					$.ajax({
 						type : "POST",
-						url : 'packetManage/updatePacket',
+						url : 'packetInManage/updatePacket',
 						dataType : "json",
 						contentType : "application/json",
 						data : JSON.stringify(data),
@@ -255,7 +287,7 @@
 			// ajax
 			$.ajax({
 				type : "GET",
-				url : "packetManage/deletePacket",
+				url : "packetInManage/deletePacket",
 				dataType : "json",
 				contentType : "application/json",
 				data : data,
@@ -297,12 +329,13 @@
 			var data = {
 				trace : $('#packet_trace').val(),
 				desc : $('#packet_desc').val(),
+				customerID : $('#customer_selector').val(),
 				repositoryID : $('#repository_selector').val()
 			}
 			// ajax
 			$.ajax({
 				type : "POST",
-				url : "packetManage/addPacket",
+				url : "packetInManage/addPacket",
 				dataType : "json",
 				contentType : "application/json",
 				data : JSON.stringify(data),
@@ -323,6 +356,7 @@
 					// reset
 					$('#packet_trace').val("");
 					$('#packet_desc').val("");
+					$('#customer_selector').val();
 					$('#repository_selector').val();
 					$('#packet_form').bootstrapValidator("resetForm", true);
 				},
@@ -380,7 +414,7 @@
 
 			// ajax
 			$.ajaxFileUpload({
-				url : "packetManage/importPacket",
+				url : "packetInManage/importPacket",
 				secureuri: false,
 				dataType: 'json',
 				fileElementId:"file",
@@ -427,7 +461,7 @@
 				searchType : search_type_packet,
 				keyWord : search_keyWord
 			}
-			var url = "packetManage/exportPacket?" + $.param(data)
+			var url = "packetInManage/exportPacket?" + $.param(data)
 			window.open(url, '_blank');
 			$('#export_modal').modal("hide");
 		})
@@ -494,7 +528,7 @@
 
 <div class="panel panel-default">
 	<ol class="breadcrumb">
-		<li>包裹信息管理</li>
+		<li>入库包裹管理</li>
 	</ol>
 	<div class="panel-body">
 		<div class="row">
@@ -572,6 +606,14 @@
 								</label>
 								<div class="col-md-8 col-sm-8">
 									<input type="text" class="form-control" id="packet_trace" name="packet_trace" placeholder="包裹运单号">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="" class="control-label col-md-4 col-sm-4"> <span>发货客户：</span>
+								</label>
+								<div class="col-md-8 col-sm-8">
+									<select name="" id="customer_selector" class="form-control">
+									</select>
 								</div>
 							</div>
 							<div class="form-group">
@@ -838,6 +880,14 @@
 									<select name="" id="packet_status_edit" class="form-control">
 										<option value="发货中">发货中</option>
 										<option value="已签收">已签收</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="" class="control-label col-md-4 col-sm-4"> <span>发货客户：</span>
+								</label>
+								<div class="col-md-8 col-sm-8">
+									<select name="" id="customer_selector_edit"  class="form-control">
 									</select>
 								</div>
 							</div>
